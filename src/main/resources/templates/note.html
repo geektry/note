@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{commons :: header(~{::title})}">
+    <title>[[${note.title}]] - 极宅笔记</title>
+</head>
+<body>
+<div class="container">
+    <h3 class="text-center mt-4">[[${note.title}]]</h3>
+    <div class="clearfix">
+        <h6 class="float-right">更新于[[${note.modifiedTs}]]</h6>
+    </div>
+    <div class="clearfix">
+        <h6 class="float-right">[[${note.pv}]]人最近浏览过</h6>
+    </div>
+    [(${note.htmlContent})]
+</div>
+</body>
+</html>

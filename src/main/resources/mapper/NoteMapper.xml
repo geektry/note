@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geektry.note.repository.NoteRepository">
+    <resultMap id="NoteMap" type="com.geektry.note.entity.Note">
+        <id property="id" column="id"/>
+        <result property="path" column="path"/>
+        <result property="title" column="title"/>
+        <result property="mdContent" column="md_content"/>
+        <result property="htmlContent" column="html_content"/>
+        <result property="pv" column="pv"/>
+        <result property="createdTs" column="created_ts"/>
+        <result property="modifiedTs" column="modified_ts"/>
+        <result property="groupId" column="group_id"/>
+    </resultMap>
+
+    <resultMap id="NoteAccessRecordMap" type="com.geektry.note.entity.AccessRecord">
+        <id property="id" column="id"/>
+        <result property="noteId" column="note_id"/>
+        <result property="clientIp" column="client_ip"/>
+        <result property="createdTs" column="created_ts"/>
+    </resultMap>
+
+    <select id="getNoteByPath" resultMap="NoteMap">
+        select id, path, title, md_content, html_content, pv, created_ts, modified_ts
+        from n_note
+        where path = #{path};
+    </select>
+
+    <insert id="insertAccessRecord" parameterType="com.geektry.note.entity.AccessRecord">
+        insert into n_access_record
+          (note_id, client_ip, user_agent, created_ts)
+        values
+          (#{noteId}, #{clientIp}, #{userAgent}, now());
+    </insert>
+
+    <update id="increasePv">
+        update n_note
+        set pv = pv + 1
+        where id = #{noteId};
+    </update>
+
+    <select id="listNotes" resultMap="NoteMap">
+        select id, path, title, pv, created_ts, modified_ts, group_id
+        from n_note
+        <if test="groupId != null">
+        where group_id = #{groupId}
+        </if>
+        order by created_ts;
+    </select>
+
+    <select id="getNote" resultMap="NoteMap">
+        select id, path, title, md_content, html_content, pv, created_ts, modified_ts, group_id
+        from n_note
+        where id = #{noteId};
+    </select>
+
+    <insert id="insertNote" parameterType="com.geektry.note.entity.Note" useGeneratedKeys="true" keyProperty="id">
+        insert into n_note
+          (path, title, md_content, html_content, pv, created_ts, modified_ts, group_id)
+        values
+          (#{path}, #{title}, #{mdContent}, #{htmlContent}, 0, now(), now(), #{groupId});
+    </insert>
+
+    <update id="updateNote">
+        update n_note
+        set
+          path = #{note.path},
+          title = #{note.title},
+          md_content = #{note.mdContent},
+          html_content = #{note.htmlContent},
+          modified_ts = now(),
+          group_id = #{note.groupId}
+        where id = #{noteId};
+    </update>
+
+    <delete id="deleteNote">
+        delete
+        from n_note
+        where id = #{noteId};
+    </delete>
+
+    <select id="countPvOfTime" resultType="com.geektry.note.vo.PvOfTimeVO">
+        select
+          date_trunc('day', nar.created_ts) samplingTime,
+          count(nar.*) pv
+        from n_access_record nar
+        where
+          <if test="noteId != null">
+          nar.note_id = #{noteId} and
+          </if>
+          <![CDATA[
+          date_trunc('day', nar.created_ts) >= #{startTime} and
+          date_trunc('day', nar.created_ts) <= #{endTime}
+          ]]>
+        group by samplingTime
+        order by samplingTime;
+    </select>
+
+    <select id="countPvOfId" resultType="com.geektry.note.vo.PvOfIdVO">
+        select
+          nar.note_id id,
+          n.title title,
+          count(nar.*) pv
+        from n_access_record nar
+        left join n_note n on n.id = nar.note_id
+        <if test="samplingTime != null">
+        where date_trunc('day', nar.created_ts) = #{samplingTime}
+        </if>
+        group by nar.note_id, n.title
+        order by pv desc;
+    </select>
+
+    <select id="listGroups" resultType="com.geektry.note.entity.Group">
+        select
+          id,
+          name
+        from n_group
+        order by id;
+    </select>
+
+    <select id="getGroup" resultType="com.geektry.note.entity.Group">
+        select
+          id,
+          name
+        from n_group
+        where id = #{groupId};
+    </select>
+
+    <insert id="insertGroup" parameterType="com.geektry.note.entity.Group" useGeneratedKeys="true" keyProperty="id">
+        insert into n_group
+          (name)
+        values
+          (#{name});
+    </insert>
+
+    <update id="updateGroup">
+        update n_group
+        set
+          name = #{group.name}
+        where id = #{groupId};
+    </update>
+
+    <delete id="deleteGroup">
+        delete
+        from n_group
+        where id = #{groupId};
+    </delete>
+</mapper>

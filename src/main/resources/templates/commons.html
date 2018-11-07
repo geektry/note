@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:replace="${title}"></title>
+
+    <link rel="stylesheet" th:href="@{/lib/bootstrap/4.1.1/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/lib/highlight.js/9.12.0/styles/darcula.css}">
+
+    <script th:src="@{/lib/highlight.js/9.12.0/highlight.pack.js}"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <style>
+        body { background-image: url('/image/background.png'); }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
