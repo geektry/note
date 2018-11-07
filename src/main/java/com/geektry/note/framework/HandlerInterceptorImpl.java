@@ -1,5 +1,6 @@
 package com.geektry.note.framework;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,6 +15,9 @@ import java.io.IOException;
  */
 @Component
 public class HandlerInterceptorImpl implements HandlerInterceptor {
+
+    @Value("${feign-client.basic-auth.string}")
+    private String basicAuthString;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
@@ -45,6 +49,6 @@ public class HandlerInterceptorImpl implements HandlerInterceptor {
     }
 
     private boolean isAuthValid(String authorization) {
-        return "Basic cm9vdDpnZWVremhhaQ==".equals(authorization);
+        return basicAuthString.equals(authorization);
     }
 }
