@@ -118,6 +118,12 @@ public interface NoteRepository {
                      @Param("groupId") Long groupId);
 
     /**
+     * 清除本分组下的note分组信息
+     * @param groupId 分组id
+     */
+    void setNoteGroupNull(@Param("groupId") Long groupId);
+
+    /**
      * 删除group
      * @param groupId 分组id
      */
