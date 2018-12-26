@@ -140,6 +140,13 @@
         where id = #{groupId};
     </update>
 
+    <update id="setNoteGroupNull">
+        update n_note
+        set
+          group_id = null
+        where group_id = #{groupId};
+    </update>
+
     <delete id="deleteGroup">
         delete
         from n_group

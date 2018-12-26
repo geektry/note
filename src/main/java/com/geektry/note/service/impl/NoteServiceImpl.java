@@ -192,6 +192,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public void deleteGroup(Long groupId) {
+        noteRepository.setNoteGroupNull(groupId);
         noteRepository.deleteGroup(groupId);
     }
 
